@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <title>رابط کاربری</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC4kjIF6GANG34Ve2I4UEjyWK2kq0qnla0&callback=initMap" async defer></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <button class="btn btn-primary mb-3 accordion">جستجو</button>
+        <div class="accordion-panel">
+            <div class="search-panel p-3 border rounded bg-light">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="searchName" placeholder="نام">
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="searchLastName" placeholder="نام خانوادگی">
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="searchNationalId" placeholder="کد ملی">
+                </div>
+                <button class="btn btn-success" onclick="persons.search()">جستجو</button>
+            </div>
+        </div>
+
+        <table id="dataTable" class="table table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ردیف</th>
+                    <th>نام</th>
+                    <th>نام خانوادگی</th>
+                    <th>کد ملی</th>
+                    <th>عملیات</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Rows will be populated here -->
+            </tbody>
+        </table>
+        <button class="btn btn-primary" onclick="persons.openAddModal()">افزودن</button>
+    </div>
+
+    <!-- Modals -->
+    <div id="addModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">افزودن</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="addName" placeholder="نام">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="addLastName" placeholder="نام خانوادگی">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="addNationalId" placeholder="کد ملی">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="saveButton" class="btn btn-primary">افزودن</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">بستن</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="viewModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">مشاهده</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p id="viewName">نام: </p>
+                    <p id="viewLastName">نام خانوادگی: </p>
+                    <p id="viewNationalId">کد ملی: </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">بستن</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="editModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">ویرایش</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="editName" placeholder="نام">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="editLastName" placeholder="نام خانوادگی">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="editNationalId" placeholder="کد ملی">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" onclick="persons.updateRecord()">تایید</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">بستن</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">حذف</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>آیا ریکورد حذف شود؟</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-danger" onclick="persons.confirmDelete()">بله</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">خیر</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="chartModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">نمودار</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <canvas id="chartCanvas"></canvas>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" onclick="persons.exportChart('pdf')">pdf</button>
+                    <button class="btn btn-primary" onclick="persons.exportChart('png')">png</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">بستن</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="mapModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">نقشه</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="map" style="height: 400px;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">بستن</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="locationModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">ثبت موقعیت</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="locationMap" style="height: 400px;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" onclick="persons.saveLocation()">ذخیره</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">بستن</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
